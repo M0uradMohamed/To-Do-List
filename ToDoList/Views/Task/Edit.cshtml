@@ -1,0 +1,28 @@
+﻿@model TaskToDo
+<div class="row">
+    <div class="col-12 mb-3">
+        <h2><a href="#"><i class="bi bi-arrow-left"></i></a> edit task</h2>
+    </div>
+</div>
+
+<div class="row">
+    <form action="/task/edit" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="title" class="form-label">title</label>
+            <input type="text" class="form-control" id="title" name="Title" value="@Model.Title">
+        </div>
+        <div class="mb-3">
+            <label for="Description" class="form-label">Description</label>
+            <input type="text" class="form-control" id="Description" name="Description" value="@Model.Description">
+        </div>
+        <div class="mb-3">
+            <label for="deadline" class="form-label">Deadline</label>
+            <input type="date" class="form-control" id="deadline" name="DeadLine" value="@Model.DeadLine.ToString("yyyy-MM-dd")">
+        </div>
+        <input type="hidden" name="MemberId" value="@Model.MemberId" />
+        <input type="hidden" name="Id" value="@Model.Id" />
+        <input type="hidden" name="CreatedDate" value="@Model.CreatedDate" />
+        <input type="hidden" name="FileLocation" value="@Model.FileLocation" />
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>

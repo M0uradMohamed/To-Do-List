@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ToDoList.Data;
 using ToDoList.Models;
 
@@ -28,18 +29,52 @@ namespace ToDoList.Controllers
                 string fileName = random + extension;
                 string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\files", fileName);
 
+                string directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\files");
+
+
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+
                 using (var stream = System.IO.File.Create(filePath))
                 {
                     file.CopyTo(stream);
                 }
-               task.fileLocation  = filePath;
+               task.FileLocation  = filePath;
 
+            }
+            else
+            {
+                task.FileLocation = "not found";
             }
 
             Context.Tasks.Add(task);
             Context.SaveChanges();
-            return RedirectToAction("index", "member", new { id = task.MemberId });
+            return RedirectToAction("index","member", new {id = task.MemberId});
         }
+        public IActionResult Edit(int id)
+        {
+            var task = Context.Tasks.Find(id);
 
+            return View(task);
+        }
+        [HttpPost]
+        public IActionResult Edit(TaskToDo task)
+        {
+            Context.Tasks.Update(task);
+            Context.SaveChanges();
+
+            return RedirectToAction("index","member",new {id=task.MemberId});
+        }
+        public IActionResult Delete(int id)
+        {
+
+            var task = Context.Tasks.Find(id);
+            int loc = task.MemberId;
+            Context.Tasks.Remove( task );
+            Context.SaveChanges();
+            return RedirectToAction("index", "member", new { id = loc });
+        }
     }
 }
