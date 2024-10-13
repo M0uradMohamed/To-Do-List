@@ -16,8 +16,8 @@ namespace ToDoList.Controllers
         {
             return View(MemberId);
         }
-            [HttpPost]
-        public IActionResult Create(TaskToDo task, IFormFile file )
+        [HttpPost]
+        public IActionResult Create(TaskToDo task, IFormFile file)
         {
             task.CreatedDate = DateTime.Now;
             if (file != null)
@@ -41,17 +41,16 @@ namespace ToDoList.Controllers
                 {
                     file.CopyTo(stream);
                 }
-               task.FileLocation  = filePath;
+                task.FileName = fileName;
 
             }
-            else
-            {
-                task.FileLocation = "not found";
-            }
+
 
             Context.Tasks.Add(task);
             Context.SaveChanges();
-            return RedirectToAction("index","member", new {id = task.MemberId});
+
+            TempData["success"] = "new task has been added";
+            return RedirectToAction("index", "member", new { id = task.MemberId });
         }
         public IActionResult Edit(int id)
         {
@@ -65,16 +64,33 @@ namespace ToDoList.Controllers
             Context.Tasks.Update(task);
             Context.SaveChanges();
 
-            return RedirectToAction("index","member",new {id=task.MemberId});
+            return RedirectToAction("index", "member", new { id = task.MemberId });
         }
-        public IActionResult Delete(int id)
+        public IActionResult Delete(int taskId)
         {
 
-            var task = Context.Tasks.Find(id);
+            var task = Context.Tasks.Find(taskId);
             int loc = task.MemberId;
-            Context.Tasks.Remove( task );
+            Context.Tasks.Remove(task);
             Context.SaveChanges();
             return RedirectToAction("index", "member", new { id = loc });
         }
+        public IActionResult DownloadFile(string fileName, int loc)
+        {
+            if (fileName != null)
+            {
+
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\files", fileName);
+                if (System.IO.File.Exists(filePath))
+                {
+                    byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+                    return File(fileBytes, "application/pdf", fileName);
+                }
+            }
+            TempData["noFile"] = "there is no file to download";
+            return RedirectToAction("index", "member", new { id = loc });
+
+        }
+
     }
 }
